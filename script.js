@@ -25,12 +25,27 @@ function randomItem(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-function randomPhone() {
+function randomDigits(count) {
   let digits = '';
-  for (let i = 0; i < 6; i += 1) {
+  for (let i = 0; i < count; i += 1) {
     digits += Math.floor(Math.random() * 10);
   }
-  return `0200${digits}`;
+  return digits;
+}
+
+function randomPhone() {
+  return `0200${randomDigits(6)}`;
+}
+
+const COUNTRY_PHONE_GENERATORS = {
+  mx: () => `+52 1 55 ${randomDigits(4)} ${randomDigits(4)}`,
+  ua: () => `+380 ${randomItem(['50', '63', '66', '67', '68', '73', '93', '95', '96', '97', '98', '99'])} ${randomDigits(3)} ${randomDigits(2)} ${randomDigits(2)}`,
+  cl: () => `+56 9 ${randomDigits(4)} ${randomDigits(4)}`,
+};
+
+function randomPhoneForCountry(country) {
+  const generator = COUNTRY_PHONE_GENERATORS[country];
+  return generator ? generator() : randomPhone();
 }
 
 function fillTestData() {
@@ -58,6 +73,9 @@ if (ipPresets) {
     const ipInput = form.querySelector('[name="ip"]');
     ipInput.value = ip;
     ipInput.focus();
+
+    const phoneInput = form.querySelector('[name="phone"]');
+    phoneInput.value = randomPhoneForCountry(chip.dataset.country);
 
     try {
       await navigator.clipboard.writeText(ip);

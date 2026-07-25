@@ -50,10 +50,12 @@ function randomPhoneForCountry(country) {
   return generator ? generator() : randomPhone();
 }
 
+let selectedCountry = null;
+
 function fillTestData() {
   form.querySelector('[name="firstName"]').value = randomItem(FIRST_NAMES);
   form.querySelector('[name="lastName"]').value = randomItem(LAST_NAMES);
-  form.querySelector('[name="phone"]').value = randomPhone();
+  form.querySelector('[name="phone"]').value = randomPhoneForCountry(selectedCountry);
 }
 
 if (randomizeButton) {
@@ -76,8 +78,9 @@ if (ipPresets) {
     ipInput.value = ip;
     ipInput.focus();
 
+    selectedCountry = chip.dataset.country;
     const phoneInput = form.querySelector('[name="phone"]');
-    phoneInput.value = randomPhoneForCountry(chip.dataset.country);
+    phoneInput.value = randomPhoneForCountry(selectedCountry);
 
     try {
       await navigator.clipboard.writeText(ip);

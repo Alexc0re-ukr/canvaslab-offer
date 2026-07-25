@@ -38,9 +38,11 @@ function randomPhone() {
 }
 
 const COUNTRY_PHONE_GENERATORS = {
-  mx: () => `+52 55 ${randomDigits(4)} ${randomDigits(4)}`,
-  ua: () => `+380 ${randomItem(['50', '63', '66', '67', '68', '73', '93', '95', '96', '97', '98', '99'])} ${randomDigits(3)} ${randomDigits(2)} ${randomDigits(2)}`,
-  cl: () => `+56 9 ${randomDigits(4)} ${randomDigits(4)}`,
+  // Local national dialing formats (no "+", no spaces) — matches the plain
+  // digit style the registration API expects for the "phone" field.
+  mx: () => `55${randomDigits(8)}`,
+  ua: () => `0${randomItem(['50', '63', '66', '67', '68', '73', '93', '95', '96', '97', '98', '99'])}${randomDigits(7)}`,
+  cl: () => `9${randomDigits(8)}`,
 };
 
 function randomPhoneForCountry(country) {

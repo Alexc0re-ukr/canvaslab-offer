@@ -45,6 +45,31 @@ if (randomizeButton) {
 
 fillTestData();
 
+// --- IP presets (Mexico / Ukraine / Chile test IPs) ------------------------
+
+const ipPresets = document.querySelector('#ipPresets');
+
+if (ipPresets) {
+  ipPresets.addEventListener('click', async (event) => {
+    const chip = event.target.closest('.ip-chip');
+    if (!chip) return;
+
+    const ip = chip.dataset.ip;
+    const ipInput = form.querySelector('[name="ip"]');
+    ipInput.value = ip;
+    ipInput.focus();
+
+    try {
+      await navigator.clipboard.writeText(ip);
+    } catch (error) {
+      // Clipboard API unavailable (e.g. insecure context) — value is still filled in.
+    }
+
+    chip.classList.add('copied');
+    setTimeout(() => chip.classList.remove('copied'), 900);
+  });
+}
+
 // --- Messages -------------------------------------------------------------
 
 function showMessage(type, title, items) {

@@ -15,6 +15,10 @@ label span { color: #4f435f; font-size: 13px; }
 input { width: 100%; border: 1px solid #c7b7e4; padding: 12px 13px; color: #251f33; background: #fff; font: inherit; }
 input:focus { outline: 2px solid #7b4ac7; outline-offset: 1px; }
 .params-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ip-presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: -6px; }
+.ip-chip { width: auto; background: #fff; color: #4f435f; border: 1px solid #c7b7e4; padding: 6px 10px; font-size: 12px; font-weight: 700; }
+.ip-chip:hover { background: #f3ecff; }
+.ip-chip.copied { background: #218a4a; color: #fff; border-color: #218a4a; }
 .message { padding: 12px 14px; font-size: 14px; line-height: 1.35; background: #fff; }
 .message strong { display: block; margin-bottom: 6px; }
 .message ul { margin: 0; padding-left: 18px; }

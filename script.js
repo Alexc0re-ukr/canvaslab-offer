@@ -38,7 +38,7 @@ function randomPhone() {
 }
 
 const COUNTRY_PHONE_GENERATORS = {
-  mx: () => `+52 1 55 ${randomDigits(4)} ${randomDigits(4)}`,
+  mx: () => `+52 55 ${randomDigits(4)} ${randomDigits(4)}`,
   ua: () => `+380 ${randomItem(['50', '63', '66', '67', '68', '73', '93', '95', '96', '97', '98', '99'])} ${randomDigits(3)} ${randomDigits(2)} ${randomDigits(2)}`,
   cl: () => `+56 9 ${randomDigits(4)} ${randomDigits(4)}`,
 };

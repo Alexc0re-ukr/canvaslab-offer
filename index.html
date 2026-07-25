@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CanvasLab Offer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="layout">
+    <section>
+      <p>Course bundle</p>
+      <h1>CanvasLab Design Sprint</h1>
+      <span>Fake UI lessons, portfolio prompts, and mentor review offer text.</span>
+    </section>
+    <aside>
+      <h2 id="spots">18 seats left</h2>
+
+      <div id="formMessage" class="message" hidden></div>
+
+      <form id="registrationForm">
+        <label>
+          <span>First name</span>
+          <input name="firstName" autocomplete="given-name" required>
+        </label>
+        <label>
+          <span>Last name</span>
+          <input name="lastName" autocomplete="family-name" required>
+        </label>
+        <label>
+          <span>Phone</span>
+          <input name="phone" autocomplete="tel" required>
+        </label>
+
+        <input type="hidden" name="p1" value="">
+        <input type="hidden" name="p2" value="">
+        <input type="hidden" name="p3" value="">
+        <input type="hidden" name="p4" value="">
+        <input type="hidden" name="p5" value="">
+        <input type="hidden" name="p6" value="">
+        <input type="hidden" name="p7" value="">
+        <input type="hidden" name="p8" value="">
+        <input type="hidden" name="p9" value="">
+        <input type="hidden" name="p10" value="">
+
+        <button type="button" id="randomizeButton">Randomize test data</button>
+        <button type="submit" id="seatButton">Reserve demo seat</button>
+      </form>
+    </aside>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

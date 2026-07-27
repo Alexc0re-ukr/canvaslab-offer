@@ -139,16 +139,16 @@ form.addEventListener('submit', async (event) => {
   });
     const data = await response.json();
 
-    if (!response.ok || !data.success) {
-      showMessage('error', 'Registration failed', data.errors || ['Registration request failed.']);
-      return;
-    }
+   if (!response.ok) {
+  showMessage('error', 'Registration failed', [data.message || 'Registration request failed.']);
+  return;
+  }
 
-    form.reset();
-    seats = Math.max(0, seats - 1);
-    spots.textContent = `${seats} seats left`;
-    showMessage('success', data.message || 'Registration request has been sent successfully.', []);
-    fillTestData();
+  form.reset();
+  seats = Math.max(0, seats - 1);
+  spots.textContent = `${seats} seats left`;
+  showMessage('success', data.message || 'Registration request has been sent successfully.', []);
+  fillTestData();
   } catch (error) {
     showMessage('error', 'Registration failed', ['Unable to send registration request.']);
   } finally {

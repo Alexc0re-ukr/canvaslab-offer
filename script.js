@@ -132,11 +132,11 @@ form.addEventListener('submit', async (event) => {
   const payload = Object.fromEntries(new FormData(form).entries());
 
   try {
-    const response = await fetch('/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+   const response = await fetch(`/api/register${window.location.search}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
     const data = await response.json();
 
     if (!response.ok || !data.success) {

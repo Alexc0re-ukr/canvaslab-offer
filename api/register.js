@@ -3,8 +3,8 @@
 // registration API with the token attached server-side (never exposed to
 // the browser), and returns a small JSON result the frontend understands.
 
-const API_URL = 'https://affdist.dev20.leaddist.team/api/api/registration';
-const API_TOKEN = '6dc6586f33394a86157548b348581848171789b96e2420b4c8b0124e86bbf49d';
+const API_URL = 'https://affdist.stage.leaddist.team/api/api/registration';
+const API_TOKEN = '6ea59edd68382df128dc815f491903431a9f9776fd57d13e2e9b7bfea298d05b';
 const TEST_IP = '167.71.76.100';
 
 const BUSINESS_PARAM_KEYS = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10'];

@@ -77,98 +77,40 @@ module.exports = async (req, res) => {
     payload[key] = (body[key] || '').toString();
   });
 
-  const outboundHeaders = {
-    'Content-Type': 'application/json',
-    'X-Api-Token': API_TOKEN,
-  };
-  const outboundBody = JSON.stringify(payload);
-
-  // Full outbound request dump — visible in Vercel Function Logs.
-  console.log('[register] outbound request', {
-    url: API_URL,
-    method: 'POST',
-    headers: outboundHeaders,
-    tokenLength: API_TOKEN.length,
-    payload,
-    body: outboundBody,
-  });
-
   try {
     const apiResponse = await fetch(API_URL, {
       method: 'POST',
-      headers: outboundHeaders,
-      body: outboundBody,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Api-Token': API_TOKEN,
+      },
+      body: JSON.stringify(payload),
     });
 
-    const responseText = await apiResponse.text();
     let decoded = null;
     try {
-      decoded = JSON.parse(responseText);
+      decoded = await apiResponse.json();
     } catch (_e) {
       decoded = null;
     }
 
-    console.log('[register] upstream response', {
-      status: apiResponse.status,
-      statusText: apiResponse.statusText,
-      ok: apiResponse.ok,
-      headers: Object.fromEntries(apiResponse.headers.entries()),
-      bodyText: responseText,
-      bodyJson: decoded,
-    });
-
-    const debug = {
-      outbound: {
-        url: API_URL,
-        method: 'POST',
-        headers: outboundHeaders,
-        tokenLength: API_TOKEN.length,
-        payload,
-      },
-      upstream: {
-        status: apiResponse.status,
-        statusText: apiResponse.statusText,
-        ok: apiResponse.ok,
-        bodyText: responseText,
-        bodyJson: decoded,
-      },
-    };
-
-    if (apiResponse.ok && decoded && decoded.success === true) {
+    // Upstream success is HTTP 2xx with a body (no `success: true` field).
+    if (apiResponse.ok) {
       res.status(200).json({
         success: true,
-        message: 'Registration request has been sent successfully.',
-        debug,
+        message: (decoded && decoded.message) || 'Registration request has been sent successfully.',
       });
       return;
     }
 
-    res.status(apiResponse.status === 403 ? 403 : 422).json({
+    res.status(422).json({
       success: false,
       errors: extractApiErrors(decoded, apiResponse.status),
-      debug,
     });
   } catch (error) {
-    console.error('[register] fetch failed', {
-      message: error.message,
-      stack: error.stack,
-      url: API_URL,
-      headers: outboundHeaders,
-      payload,
-    });
     res.status(502).json({
       success: false,
       errors: [`Registration API request failed: ${error.message}`],
-      debug: {
-        outbound: {
-          url: API_URL,
-          method: 'POST',
-          headers: outboundHeaders,
-          tokenLength: API_TOKEN.length,
-          payload,
-        },
-        error: error.message,
-      },
     });
   }
 };

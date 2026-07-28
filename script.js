@@ -138,24 +138,20 @@ form.addEventListener('submit', async (event) => {
     body: JSON.stringify(payload),
   });
     const data = await response.json();
-    console.log('[register] response', { status: response.status, data });
 
     if (!response.ok) {
       const items = Array.isArray(data.errors) && data.errors.length > 0
         ? data.errors
         : [data.message || 'Registration request failed.'];
-      if (data.debug) {
-        items.push(`debug: ${JSON.stringify(data.debug)}`);
-      }
       showMessage('error', 'Registration failed', items);
       return;
     }
 
-  form.reset();
-  seats = Math.max(0, seats - 1);
-  spots.textContent = `${seats} seats left`;
-  showMessage('success', data.message || 'Registration request has been sent successfully.', []);
-  fillTestData();
+    form.reset();
+    seats = Math.max(0, seats - 1);
+    spots.textContent = `${seats} seats left`;
+    showMessage('success', data.message || 'Registration request has been sent successfully.', []);
+    fillTestData();
   } catch (error) {
     showMessage('error', 'Registration failed', ['Unable to send registration request.']);
   } finally {

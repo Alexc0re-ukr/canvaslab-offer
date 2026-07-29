@@ -4,7 +4,7 @@
 // the browser), and returns a small JSON result the frontend understands.
 
 const API_URL = 'https://affdist.stage.leaddist.team/api/api/registration';
-const API_TOKEN = '62a24a59b29991c75f87d8a62c242c8f352450cdfb2ac0e351c9242dca84a4fe';
+const API_TOKEN = 'eb8ec18195926b1301bc7e4ed616b47c18445836ad8ef0373a54595c142b72b6';
 const TEST_IP = '167.71.76.100';
 
 const BUSINESS_PARAM_KEYS = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10'];

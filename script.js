@@ -122,6 +122,34 @@ function showMessage(type, title, items) {
 // That function holds the real API token and forwards the request server
 // side, so the token never reaches the browser.
 
+// CD-357: /api/register now proxies the registration API's raw response
+// (status + body) instead of wrapping it, and that API has no `success`
+// field — it signals success via HTTP status alone. So success = response.ok,
+// and error text has to be pulled out of whatever shape the raw body has.
+function extractErrorItems(data, statusCode) {
+  if (!data || typeof data !== 'object') {
+    return [`Registration request failed (HTTP ${statusCode}).`];
+  }
+  if (Array.isArray(data.errors) && data.errors.length > 0) {
+    return data.errors;
+  }
+  if (Array.isArray(data.data) && data.data.length > 0) {
+    const items = data.data
+      .map((item) => {
+        if (!item || typeof item !== 'object') return null;
+        const msg = item.message || '';
+        const field = item.field || '';
+        return msg ? (field ? `${field}: ${msg}` : msg) : null;
+      })
+      .filter(Boolean);
+    if (items.length > 0) return items;
+  }
+  if (data.message) {
+    return [data.message];
+  }
+  return [`Registration request failed (HTTP ${statusCode}).`];
+}
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
@@ -137,17 +165,23 @@ form.addEventListener('submit', async (event) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-    const data = await response.json();
+    let data = null;
+    try {
+      data = await response.json();
+    } catch (_e) {
+      data = null;
+    }
 
-    if (!response.ok || !data.success) {
-      showMessage('error', 'Registration failed', data.errors || ['Registration request failed.']);
+    if (!response.ok) {
+      showMessage('error', 'Registration failed', extractErrorItems(data, response.status));
       return;
     }
 
     form.reset();
     seats = Math.max(0, seats - 1);
     spots.textContent = `${seats} seats left`;
-    showMessage('success', data.message || 'Registration request has been sent successfully.', []);
+    const successItems = data && data.clickId ? [`AffDist Click ID: ${data.clickId}`] : [];
+    showMessage('success', (data && data.message) || 'Registration request has been sent successfully.', successItems);
     fillTestData();
   } catch (error) {
     showMessage('error', 'Registration failed', ['Unable to send registration request.']);

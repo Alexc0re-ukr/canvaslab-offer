@@ -1,7 +1,14 @@
 // Vercel serverless function: /api/register
 // Receives the form POST from the static page, forwards it to the real
 // registration API with the token attached server-side (never exposed to
-// the browser), and returns a small JSON result the frontend understands.
+// the browser), and proxies the API's raw response back to the frontend.
+//
+// CD-357: the registration API has no `success` field in its body — it
+// signals success purely via HTTP status (200 on success, with a body like
+// { message, redirectURL, clickId }). A validation failure comes back as a
+// non-2xx with its own body shape. So we don't re-wrap the response here —
+// we just forward the upstream status + body as-is, and the frontend keys
+// off `response.ok` plus whatever fields are present.
 
 const API_URL = 'https://affdist.dev20.leaddist.team/api/api/registration';
 const API_TOKEN = '6dc6586f33394a86157548b348581848171789b96e2420b4c8b0124e86bbf49d';
@@ -17,26 +24,6 @@ function randomHex(bytes) {
   return out;
 }
 
-function extractApiErrors(decoded, statusCode) {
-  if (!decoded || typeof decoded !== 'object') {
-    return [`Registration API returned HTTP ${statusCode}.`];
-  }
-
-  const errors = [];
-  const data = Array.isArray(decoded.data) ? decoded.data : [];
-
-  data.forEach((item) => {
-    if (!item || typeof item !== 'object') return;
-    const msg = item.message || '';
-    const field = item.field || '';
-    if (msg) errors.push(field ? `${field}: ${msg}` : msg);
-  });
-
-  if (errors.length > 0) return errors;
-  if (decoded.message) return [decoded.message];
-  return [`Registration API returned HTTP ${statusCode}.`];
-}
-
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -48,7 +35,7 @@ module.exports = async (req, res) => {
   }
 
   if (req.method !== 'POST') {
-    res.status(405).json({ success: false, errors: ['Method not allowed.'] });
+    res.status(405).json({ errors: ['Method not allowed.'] });
     return;
   }
 
@@ -65,7 +52,7 @@ module.exports = async (req, res) => {
   if (!phone) errors.push('Phone is required.');
 
   if (errors.length > 0) {
-    res.status(422).json({ success: false, errors });
+    res.status(422).json({ errors });
     return;
   }
 
@@ -103,33 +90,9 @@ module.exports = async (req, res) => {
       decoded = null;
     }
 
-    // TEMP DEBUG (CD-357): log the raw upstream response so we can see its
-    // real shape in Vercel Function Logs. Remove once the success check below
-    // is fixed to match the real API contract.
-    console.log('[CD-357 DEBUG] upstream status:', apiResponse.status, apiResponse.ok);
-    console.log('[CD-357 DEBUG] upstream body:', JSON.stringify(decoded));
-
-    if (apiResponse.ok && decoded && decoded.success === true) {
-      res.status(200).json({
-        success: true,
-        message: 'Registration request has been sent successfully.',
-        // TEMP DEBUG (CD-357): remove once success-check is confirmed correct.
-        debugUpstream: { status: apiResponse.status, body: decoded },
-      });
-      return;
-    }
-
-    res.status(422).json({
-      success: false,
-      errors: extractApiErrors(decoded, apiResponse.status),
-      // TEMP DEBUG (CD-357): raw upstream response, visible in Network tab.
-      // Remove once the success check above is fixed to match the real API contract.
-      debugUpstream: { status: apiResponse.status, ok: apiResponse.ok, body: decoded },
-    });
+    // Proxy the upstream status + body through unchanged.
+    res.status(apiResponse.status).json(decoded ?? {});
   } catch (error) {
-    res.status(502).json({
-      success: false,
-      errors: [`Registration API request failed: ${error.message}`],
-    });
+    res.status(502).json({ errors: [`Registration API request failed: ${error.message}`] });
   }
 };

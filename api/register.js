@@ -64,7 +64,7 @@ module.exports = async (req, res) => {
     ip,
     languageIsoCode: (req.headers['accept-language'] || 'en').slice(0, 2) || 'en',
     trafficSource: 'FB',
-    externalClickId: (req.query && (req.query.click_id || req.query.external_click_id)) || '',
+    externalClickId: (req.query && (req.query.token || req.query.click_id || req.query.external_click_id)) || '',
     browser: req.headers['user-agent'] || '',
     trackingType: 'smart_link_ai_tracker',
   };

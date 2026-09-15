@@ -103,10 +103,18 @@ module.exports = async (req, res) => {
       decoded = null;
     }
 
+    // TEMP DEBUG (CD-357): log the raw upstream response so we can see its
+    // real shape in Vercel Function Logs. Remove once the success check below
+    // is fixed to match the real API contract.
+    console.log('[CD-357 DEBUG] upstream status:', apiResponse.status, apiResponse.ok);
+    console.log('[CD-357 DEBUG] upstream body:', JSON.stringify(decoded));
+
     if (apiResponse.ok && decoded && decoded.success === true) {
       res.status(200).json({
         success: true,
         message: 'Registration request has been sent successfully.',
+        // TEMP DEBUG (CD-357): remove once success-check is confirmed correct.
+        debugUpstream: { status: apiResponse.status, body: decoded },
       });
       return;
     }
@@ -114,6 +122,9 @@ module.exports = async (req, res) => {
     res.status(422).json({
       success: false,
       errors: extractApiErrors(decoded, apiResponse.status),
+      // TEMP DEBUG (CD-357): raw upstream response, visible in Network tab.
+      // Remove once the success check above is fixed to match the real API contract.
+      debugUpstream: { status: apiResponse.status, ok: apiResponse.ok, body: decoded },
     });
   } catch (error) {
     res.status(502).json({
